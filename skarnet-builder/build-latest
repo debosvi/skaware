@@ -58,7 +58,7 @@ includes[s6-portable-utils]="${includes[s6]}"
 includes[s6-linux-utils]="--with-include=$PACKAGEDIR/linux-headers/include ${includes[s6]}"
 includes[s6-dns]="${includes[s6]}"
 includes[s6-networking]="--with-include=$PACKAGEDIR/s6-dns/usr/include --with-include=$PACKAGEDIR/s6/usr/include ${includes[s6]}"
-includes[s6-rc]="${includes[s6]}"
+includes[s6-rc]="${includes[s6]} --with-include=$PACKAGEDIR/s6/usr/include"
 
 declare -A libs
 libs[skalibs]="--with-lib=/usr/musl/lib"
@@ -68,7 +68,7 @@ libs[s6-portable-utils]="${libs[s6]}"
 libs[s6-linux-utils]="${libs[s6]}"
 libs[s6-dns]="${libs[s6]}"
 libs[s6-networking]="--with-lib=$PACKAGEDIR/s6-dns/usr/lib --with-lib=$PACKAGEDIR/s6/usr/lib ${libs[s6]}"
-libs[s6-rc]="${libs[s6]}"
+libs[s6-rc]="${libs[s6]} --with-lib=$PACKAGEDIR/s6/usr/lib"
 
 declare -A sysdeps
 sysdeps[skalibs]=""
