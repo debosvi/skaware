@@ -21,6 +21,7 @@ s6-portable-utils
 s6-linux-utils
 s6-dns
 s6-networking
+s6-rc
 )
 
 # linux packages
@@ -46,6 +47,7 @@ versions[s6-portable-utils]=2.0.5.2
 versions[s6-linux-utils]=2.0.2.1
 versions[s6-dns]=2.0.0.4
 versions[s6-networking]=2.1.0.1
+versions[s6-rc]=0.0.1.1
 
 declare -A includes
 includes[skalibs]="--with-include=$PACKAGEDIR/musl/include"
@@ -55,6 +57,7 @@ includes[s6-portable-utils]="${includes[s6]}"
 includes[s6-linux-utils]="--with-include=$PACKAGEDIR/linux-headers/include ${includes[s6]}"
 includes[s6-dns]="${includes[s6]}"
 includes[s6-networking]="--with-include=$PACKAGEDIR/s6-dns/usr/include --with-include=$PACKAGEDIR/s6/usr/include ${includes[s6]}"
+includes[s6-rc]="${includes[s6]}"
 
 declare -A libs
 libs[skalibs]="--with-lib=/usr/musl/lib"
@@ -64,6 +67,7 @@ libs[s6-portable-utils]="${libs[s6]}"
 libs[s6-linux-utils]="${libs[s6]}"
 libs[s6-dns]="${libs[s6]}"
 libs[s6-networking]="--with-lib=$PACKAGEDIR/s6-dns/usr/lib --with-lib=$PACKAGEDIR/s6/usr/lib ${libs[s6]}"
+libs[s6-rc]="${libs[s6]}"
 
 declare -A sysdeps
 sysdeps[skalibs]=""
@@ -73,6 +77,7 @@ sysdeps[s6-portable-utils]="${sysdeps[execline]}"
 sysdeps[s6-linux-utils]="${sysdeps[execline]}"
 sysdeps[s6-dns]="${sysdeps[execline]}"
 sysdeps[s6-networking]="${sysdeps[execline]}"
+sysdeps[s6-rc]="${sysdeps[execline]}"
 
 declare -A configopts
 configopts[skalibs]="--datadir=/etc --enable-force-devr"
@@ -81,6 +86,7 @@ configopts[s6]=""
 configopts[s6-portable-utils]=""
 configopts[s6-dns]=""
 configopts[s6-networking]=""
+configopts[s6-rc]=""
 
 declare -A manifests
 manifests[skarnet_all_packages]="manifest.txt"
@@ -90,7 +96,7 @@ manifests[skarnet_portable_packages]="manifest-portable.txt"
 build_install_skarnet_package() {
     local package=$1
     cd "$BUILDDIR"
-    curl -R -L -O -C - "http://skarnet.org/software/${package}/${package}-${versions[$package]}.tar.gz"
+    wget -c "http://skarnet.org/software/${package}/${package}-${versions[$package]}.tar.gz"
     tar xf "${package}-${versions[$package]}.tar.gz"
     cd "${package}-${versions[$package]}"
     CC="$PACKAGEDIR/musl/bin/musl-gcc" ./configure \
@@ -137,7 +143,7 @@ tar_skarnet_package() {
 
 # install make
 cd "$BUILDDIR"
-curl -R -L -O http://ftp.gnu.org/gnu/make/make-${versions[make]}.tar.gz
+wget -c http://ftp.gnu.org/gnu/make/make-${versions[make]}.tar.gz
 tar xf make-${versions[make]}.tar.gz
 cd make-${versions[make]}
 
@@ -147,7 +153,7 @@ make install
 
 # install musl
 cd "$BUILDDIR"
-curl -R -L -O http://www.musl-libc.org/releases/musl-${versions[musl]}.tar.gz
+wget -c http://www.musl-libc.org/releases/musl-${versions[musl]}.tar.gz
 tar xf musl-${versions[musl]}.tar.gz
 cd musl-${versions[musl]}
 
@@ -160,7 +166,7 @@ ${MAKE_4x} install
 
 # install linux-headers
 cd "$BUILDDIR"
-curl -R -L -O -C - http://www.kernel.org/pub/linux/kernel/v3.x/linux-${versions[linux]}.tar.xz
+wget -c http://www.kernel.org/pub/linux/kernel/v3.x/linux-${versions[linux]}.tar.xz
 tar xf linux-${versions[linux]}.tar.xz
 cd linux-${versions[linux]}
 for i in $PATCHDIR/linux/*.patch; do
