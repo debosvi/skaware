@@ -2,9 +2,10 @@
 set -e
 set -x
 
-BUILDDIR=$HOME/build
-PACKAGEDIR=$HOME/pkg
-DISTDIR=$HOME/dist
+CURDIR=$(pwd)
+BUILDDIR=$CURDIR/build
+PACKAGEDIR=$CURDIR/pkg
+DISTDIR=$CURDIR/dist
 PATCHDIR="$(pwd)/patches"
 
 mkdir -p "$BUILDDIR" "$PACKAGEDIR" "$DISTDIR"
