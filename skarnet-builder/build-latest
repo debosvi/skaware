@@ -150,36 +150,69 @@ tar_skarnet_package() {
 
 # install make
 cd "$BUILDDIR"
-wget -c http://ftp.gnu.org/gnu/make/make-${versions[make]}.tar.gz
-tar xf make-${versions[make]}.tar.gz
-cd make-${versions[make]}
+if [ ! -f "$BUILDDIR"/.make_download ]; then
+    wget -c http://ftp.gnu.org/gnu/make/make-${versions[make]}.tar.gz
+    touch "$BUILDDIR"/.make_download
+fi
 
-./configure --prefix="$PACKAGEDIR/make"
-make
-make install
+if [ ! -f $BUILDDIR/.make_extract ]; then
+    tar xf make-${versions[make]}.tar.gz
+    touch "$BUILDDIR"/.make_extract
+fi    
+
+if [ ! -f "$BUILDDIR"/.make_build ]; then
+    cd make-${versions[make]}
+
+    ./configure --prefix="$PACKAGEDIR/make"
+    make
+    make install
+    touch "$BUILDDIR"/.make_build
+fi    
 
 # install musl
 cd "$BUILDDIR"
-wget -c http://www.musl-libc.org/releases/musl-${versions[musl]}.tar.gz
-tar xf musl-${versions[musl]}.tar.gz
-cd musl-${versions[musl]}
+if [ ! -f "$BUILDDIR"/.musl_download ]; then
+    wget -c http://www.musl-libc.org/releases/musl-${versions[musl]}.tar.gz
+    touch "$BUILDDIR"/.musl_download
+fi    
+    
+if [ ! -f "$BUILDDIR"/.musl_extract ]; then
+    tar xf musl-${versions[musl]}.tar.gz
+    touch "$BUILDDIR"/.musl_extract
+fi    
 
-CFLAGS="-fno-toplevel-reorder -fno-stack-protector" \
-  ./configure                                       \
-    --prefix=$PACKAGEDIR/musl                       \
-    --disable-shared
-${MAKE_4x}
-${MAKE_4x} install
+if [ ! -f "$BUILDDIR"/.musl_build ]; then
+    cd musl-${versions[musl]}
+
+    CFLAGS="-fno-toplevel-reorder -fno-stack-protector" \
+      ./configure                                       \
+        --prefix=$PACKAGEDIR/musl                       \
+        --disable-shared
+    ${MAKE_4x}
+    ${MAKE_4x} install
+    touch "$BUILDDIR"/.musl_build
+fi    
 
 # install linux-headers
 cd "$BUILDDIR"
-wget -c --no-check-certificate http://www.kernel.org/pub/linux/kernel/v3.x/linux-${versions[linux]}.tar.xz
-tar xf linux-${versions[linux]}.tar.xz
-cd linux-${versions[linux]}
-for i in $PATCHDIR/linux/*.patch; do
-    patch -p1 -i "${i}" || true
-done
-make headers_install ARCH="$(uname -m)" INSTALL_HDR_PATH="$PACKAGEDIR/linux-headers" CC="$PACKAGEDIR/musl/bin/musl-gcc"
+if [ ! -f "$BUILDDIR"/.kernel_download ]; then
+    wget -c --no-check-certificate http://www.kernel.org/pub/linux/kernel/v3.x/linux-${versions[linux]}.tar.xz
+    touch "$BUILDDIR"/.kernel_download
+fi 
+
+if [ ! -f "$BUILDDIR"/.kernel_extract ]; then
+    tar xf linux-${versions[linux]}.tar.xz
+    touch "$BUILDDIR"/.kernel_extract
+fi 
+
+if [ ! -f "$BUILDDIR"/.kernel_build ]; then
+    cd linux-${versions[linux]}
+    for i in $PATCHDIR/linux/*.patch; do
+        patch -p1 -i "${i}" || true
+    done
+    make headers_install ARCH="$(uname -m)" INSTALL_HDR_PATH="$PACKAGEDIR/linux-headers" CC="gcc"
+    touch "$BUILDDIR"/.kernel_build
+fi 
 
 # install skarnet packages
 for package in "${skarnet_all_packages[@]}"; do
